@@ -1,0 +1,162 @@
+#!/bin/bash
+Script="${0##*/}"                   # Need 'Script' for wmakeFunctions messages
+scriptsDir="${0%/*}"/scripts        # wmake/scripts directory
+. "$scriptsDir"/wmakeFunctions      # Source wmake functions
+
+# TODO: 检查当前路径是否是CMAKE_SOURCE_DIR
+# 其中包含.vscode, CMakeLists.txt
+# ...
+
+# TODO: 根据OF环境变量，设置安装目录
+
+
+printInfo() {
+    if [ -f "$WM_DIR"/makefiles/info ]
+    then
+        make --no-print-directory -f "$WM_DIR"/makefiles/info "$@"
+    else
+        echo "OpenFOAM environment not set?" 1>&2
+        return 1
+    fi
+}
+
+if [ -z "$objectsDir" ]
+then
+    objectsDir="$MakeDir/$WM_OPTIONS"
+fi
+mkdir -p "$objectsDir"
+
+make -s -f "$WM_DIR"/makefiles/files MAKE_DIR="$MakeDir" OBJECTS_DIR="$objectsDir" "$objectsDir"/options
+make -s -f "$WM_DIR"/makefiles/files MAKE_DIR="$MakeDir" OBJECTS_DIR="$objectsDir"
+s=`make --dry-run -f "$WM_DIR"/makefiles/general MAKE_DIR="$MakeDir" OBJECTS_DIR="$objectsDir" $targetType`
+
+link_flags_extra=`echo $s | grep -oP '(?<=Xlinker).*(?=Make)'`
+link_flags_extra="-Xlinker $link_flags_extra"
+
+OF_compile_flags=`printInfo "cxxflags"`
+OF_link_flags="$OF_compile_flags $link_flags_extra"
+# echo OF_compile_flags: $OF_compile_flags
+# echo OF_link_flags: $OF_link_flags
+
+OF_project_name=`cat Make/files | grep -oP '(?<=/).*$'`
+
+# echo OF_testCaseDir: '${CMAKE_SORCE_DIR}/testCase'
+OF_sources=`cat Make/files | grep -oP '.*.C'`
+# echo OF_sources: $OF_sources
+
+str_inc=`echo $s | sed 's/ /\n/g' | grep -E '^-I' | sort | uniq |grep -oP '(?<=-I).*'`
+OF_includeDir=${str_inc/%lnInclude/}
+# echo OF_includeDir: $OF_includeDir
+
+OF_linkLib=`echo $s | sed 's/ /\n/g' | grep -E '^-l' | sort | uniq |grep -oP '(?<=-l).*'`
+OF_linkDir=$WM_PROJECT_DIR/platforms/$WM_OPTIONS/lib
+# echo OF_linkLib: $OF_linkLib
+# echo OF_linkDir: $OF_linkDir
+
+# 写入文件 .vscode/of-gdb.sh
+mkdir -p .vscode
+cat > .vscode/of-gdb.sh <<EOF
+#!/bin/bash
+source $FOAM_ETC/bashrc WM_MPLIB=$WM_MPLIB WM_COMPILE_OPTION=$WM_COMPILE_OPTION WM_COMPILER=$WM_COMPILER
+/usr/bin/gdb "\$@"
+EOF
+# 写入文件 .vscode/launch.json
+cat > .vscode/launch.json << EOF
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            // Resolved by CMake Tools:
+            "program": "\${command:cmake.launchTargetPath}",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "\${workspaceFolder}/testCase",
+            "environment": [
+                {
+                    // add the directory where our target was built to the PATHs
+                    // it gets resolved by CMake Tools:
+                    "name": "PATH",
+                    "value": "\${env:PATH}:\${command:cmake.getLaunchTargetDirectory}"
+                },
+                {
+                    "name": "OTHER_VALUE",
+                    "value": "Something something"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "\${workspaceFolder}/.vscode/of-gdb.sh",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
+EOF
+chmod +x .vscode/of-gdb.sh
+
+# 写入文件 CMakeLists.txt
+cat > CMakeLists.txt <<EOF
+cmake_minimum_required(VERSION 3.12)
+#=== OF related variables ===
+set(project_name $OF_project_name)
+set(WM_COMPILE_OPTION $WM_COMPILE_OPTION)
+set(OF_compile_flags "$OF_compile_flags")
+set(OF_link_flags "$OF_link_flags")
+set(OF_testCaseDir \${CMAKE_SOURCE_DIR}/testCase)
+
+set(OF_sources 
+$OF_sources
+)
+set(OF_includeDir
+$OF_includeDir
+)
+set(OF_linkLib     
+$OF_linkLib
+)
+set(OF_linkDir 
+$OF_linkDir
+)
+#===         End          ===
+
+project(\${project_name} LANGUAGES CXX C)
+set(ENV{LD_LIBRARY_PATH} "\$ENV{LD_LIBRARY_PATH}:\${OF_linkDir}")
+
+
+if(\${WM_COMPILE_OPTION} STREQUAL "Opt")
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Release mode" FORCE)
+endif()
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED)
+
+link_directories(
+    \${OF_linkDir}
+)
+
+include_directories(
+    \${OF_includeDir}
+    \${CMAKE_SOURCE_DIR}/lnInclude
+    \${CMAKE_SOURCE_DIR}
+)
+
+add_executable(\${project_name} 
+    \${OF_sources}
+)
+
+target_link_libraries( 
+    \${project_name}
+    PRIVATE
+    \${OF_linkLib}
+)
+set_target_properties( \${project_name} PROPERTIES
+    COMPILE_FLAGS \${OF_compile_flags}
+    LINK_FLAGS \${OF_link_flags}
+    WORKING_DIRECTORY \${OF_testCaseDir})
+EOF

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+objDir=$WM_PROJECT_DIR/wmake
+if [ -d $objDir ]
+then
+    cwd=`pwd`
+    chmod +x ./ofCmakeConfig
+    rm -f $objDir/ofCmakeConfig
+    ln -s $cwd/ofCmakeConfig $objDir/
+    echo "installed ofCmakeConfig"
+else
+    echo "please active OpenFOAM environment"
+fi
