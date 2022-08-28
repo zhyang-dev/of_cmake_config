@@ -1,4 +1,5 @@
 # of_cmake_config
+[中文](README.md) | [英文](README.en.md)
 
 #### Description
 This project is used to generate CMakeLists.txt for OpenFOAM project.
@@ -13,4 +14,8 @@ This project is used to generate CMakeLists.txt for OpenFOAM project.
 #### Instructions
 
 1.  Activate OpenFOAM environment
-2.  In project root path, run `ofCmakeConfig`
+2.  In project root path, 
+    - run `ofCmakeConfig` to generate `CMakeLists.txt`
+    - or run `occ`, which is a wrapper of `ofCmakeConfig` script, to generate `CMakeLists.txt` and `compile_commands.json`.
+
+[video demo](demo/occ_demo.mp4)

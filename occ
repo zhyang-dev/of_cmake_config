@@ -1,0 +1,4 @@
+#!/bin/bash
+ofCmakeConfig
+rm -r build && mkdir build
+cmake -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .

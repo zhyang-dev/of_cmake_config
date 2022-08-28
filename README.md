@@ -1,4 +1,5 @@
 # of_cmake_config
+[中文](README.md) | [英文](README.en.md)
 
 #### 介绍
 本项目用于生成OpenFOAM项目的CMakeLists.txt
@@ -13,4 +14,13 @@
 #### 使用说明
 
 0. 激活OpenFOAM环境
-1. 在项目根目录下, 运行 `ofCmakeConfig`
+1. 在项目根目录下, 
+    - 运行 `ofCmakeConfig`，生成`CMakeLists.txt`
+    - 或运行`occ`，其包装了`ofCmakeConfig`，除了生成`CMakeLists.txt`，还会调用cmake，生成`compile_commands.json`。
+
+
+#### 测试环境
+- `vscode` + `clangd`
+- `vim` + `coc-clangd`
+
+[视频演示](demo/occ_demo.mp4)
