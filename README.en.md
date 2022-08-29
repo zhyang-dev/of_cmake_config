@@ -1,5 +1,5 @@
 # of_cmake_config
-[中文](README.md) | [英文](README.en.md)
+[中文](README.md) | [English](README.en.md)
 
 #### Description
 This project is used to generate CMakeLists.txt for OpenFOAM project.
