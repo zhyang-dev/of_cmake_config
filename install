@@ -5,6 +5,7 @@ if [ -d $objDir ]
 then
     cwd=`pwd`
     chmod +x ./ofCmakeConfig
+    chmod +x ./occ
     rm -f $objDir/ofCmakeConfig $objDir/occ
     ln -s $cwd/ofCmakeConfig $objDir/
     ln -s $cwd/occ $objDir/
