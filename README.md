@@ -23,4 +23,4 @@
 - `vscode` + `clangd`
 - `vim` + `coc-clangd`
 
-[视频演示](demo/occ_demo.mp4)
+[视频演示](demo/occ_demo.gif)

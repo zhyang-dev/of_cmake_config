@@ -18,4 +18,4 @@ This project is used to generate CMakeLists.txt for OpenFOAM project.
     - run `ofCmakeConfig` to generate `CMakeLists.txt`
     - or run `occ`, which is a wrapper of `ofCmakeConfig` script, to generate `CMakeLists.txt` and `compile_commands.json`.
 
-[video demo](demo/occ_demo.mp4)
+[video demo](demo/occ_demo.gif)
