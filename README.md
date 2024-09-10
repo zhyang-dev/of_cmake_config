@@ -1,26 +1,21 @@
 # of_cmake_config
-[中文](README.md) | [English](README.en.md)
+[中文](./README.zh_CN.md) | [English](./README.md)
 
-#### 介绍
-本项目用于生成OpenFOAM项目的CMakeLists.txt
+#### Description
+This project is used to generate CMakeLists.txt for OpenFOAM project.
 
-#### 安装教程
-0. 激活OpenFOAM环境: 
-    - 使用别名 `of2012clang` or `of2012clangdebug`
-    - 直接source: `source $HOME/OpenFOAM/OpenFOAM-v2012/etc/bashrc WM_COMPILER=Clang ...`
-1. 获取该项目源码：`git clone https://gitee.com/xfygogo/of_cmake_config.git of_cmake_config`
-2. 安装：`cd of_cmake_config && ./install`
+#### Installation
+0. Activate OpenFOAM environment: 
+    - Using alias `of2012clang` or `of2012clangdebug`
+    - source directly: `source $HOME/OpenFOAM/OpenFOAM-v2012/etc/bashrc WM_COMPILER=Clang ...`
+1. Get this project: `git clone https://gitee.com/xfygogo/of_cmake_config.git of_cmake_config`
+2. Install: `cd of_cmake_config && ./install`
 
-#### 使用说明
+#### Instructions
 
-0. 激活OpenFOAM环境
-1. 在项目根目录下, 
-    - 运行 `ofCmakeConfig`，生成`CMakeLists.txt`
-    - 或运行`occ`，其包装了`ofCmakeConfig`，除了生成`CMakeLists.txt`，还会调用cmake，生成`compile_commands.json`。
+1.  Activate OpenFOAM environment
+2.  In project root path, 
+    - run `ofCmakeConfig` to generate `CMakeLists.txt`
+    - or run `occ`, which is a wrapper of `ofCmakeConfig` script, to generate `CMakeLists.txt` and `compile_commands.json`.
 
-
-#### 测试环境
-- `vscode` + `clangd`
-- `vim` + `coc-clangd`
-
-[视频演示](demo/occ_demo.gif)
+![video demo](demo/occ_demo.gif)
