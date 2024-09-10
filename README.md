@@ -8,7 +8,7 @@ This project is used to generate CMakeLists.txt for OpenFOAM project.
 0. Activate OpenFOAM environment: 
     - Using alias `of2012clang` or `of2012clangdebug`
     - source directly: `source $HOME/OpenFOAM/OpenFOAM-v2012/etc/bashrc WM_COMPILER=Clang ...`
-1. Get this project: `git clone https://gitee.com/xfygogo/of_cmake_config.git of_cmake_config`
+1. Get this project: `git clone https://github.com/zhyang-dev/of_cmake_config.git`
 2. Install: `cd of_cmake_config && ./install`
 
 #### Instructions
