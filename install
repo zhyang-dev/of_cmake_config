@@ -3,12 +3,10 @@
 objDir=$WM_PROJECT_DIR/wmake
 if [ -d $objDir ]
 then
-    cwd=`pwd`
     chmod +x ./ofCmakeConfig
     chmod +x ./occ
     rm -f $objDir/ofCmakeConfig $objDir/occ
-    ln -s $cwd/ofCmakeConfig $objDir/
-    ln -s $cwd/occ $objDir/
+    cp  ofCmakeConfig occ wmakelog2cmakelists.py $objDir/
     echo "installed ofCmakeConfig"
 else
     echo "please active OpenFOAM environment"
