@@ -6,7 +6,7 @@ This project is used to generate `CMakeLists.txt` for OpenFOAM projects.
 
 #### Installation Guide
 0. Activate the required OpenFOAM environment (otherwise the installation will fail).
-1. Obtain the project source code: `git clone https://github.com/zhyang-dev/of_cmake_config.git`
+1. Obtain the project source code: `git clone --depth=1 https://github.com/zhyang-dev/of_cmake_config.git`
 2. Install: `cd of_cmake_config && ./install`
 
 #### Usage Instructions
