@@ -1,10 +1,11 @@
 #!/bin/bash
 
-if [ ! -f "log.wmake" ]
-then
-    echo "wmake > log.wmake"
-    wmake $@ >log.wmake 2>&1
-fi
+wclean && wmake $@ > log.wmake 2>&1 
+# if [ ! -f "log.wmake" ]
+# then
+#     echo "wmake > log.wmake"
+#     wmake $@ >log.wmake 2>&1
+# fi
 
 # Find the Python executable in the system
 PYTHON_EXEC=$(which python3)

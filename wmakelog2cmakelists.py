@@ -56,8 +56,15 @@ def parse_wmake_log(log_file):
             # Determine if it's a compile or link statement
             if '-Xlinker' in line or '-Wl,' in line:
                 # Link statement
+                # Handle -fuse-ld
+                useld = re.search(r'(-fuse-ld=\S+)', line)
+                if useld:
+                    link_options.append(f'{useld.group(1)}')
+                print(link_options)
+                # Handle output file
                 output_file = re.search(r'-o\s+(\S+)', line).group(1)
-                lib_matches = re.findall(r'-l(\S+)', line)
+                # Handle libraries
+                lib_matches = re.findall(r' -l(\S+)', line)
                 for lib in lib_matches:
                     if lib not in link_libraries:
                         link_libraries.append(lib)
@@ -93,8 +100,8 @@ def parse_wmake_log(log_file):
         objstr = f'add_library({objname} STATIC {" ".join(source_files)})'
 
     # Handle the issue of link and target having the same name
-    link_libraries = [lib if lib != objname else f'lib{
-        lib}.so' for lib in link_libraries]
+    link_libraries = [lib if lib != objname else f'lib{lib}.so' 
+                      for lib in link_libraries]
 
     # Create CMakeLists.txt content
     cmake_content = f"""cmake_minimum_required(VERSION 3.10)
