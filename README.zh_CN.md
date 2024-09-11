@@ -6,7 +6,7 @@
 
 #### 安装教程
 0. 激活需要的OpenFOAM环境（否则会安装失败）
-1. 获取该项目源码：`git clone https://github.com/zhyang-dev/of_cmake_config.git`
+1. 获取该项目源码：`git clone --depth=1 https://github.com/zhyang-dev/of_cmake_config.git`
 2. 安装：`cd of_cmake_config && ./install`
 
 #### 使用说明
