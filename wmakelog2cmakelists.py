@@ -1,4 +1,9 @@
 import re
+import argparse
+
+def debugInfo(debug_str, is_debug=False):
+    if is_debug:
+        print(debug_str)
 
 def remove_duplicates(seq):
     """
@@ -25,7 +30,7 @@ def preprocess_lines(lines):
 
     return merged_lines
 
-def parse_wmake_log(log_file):
+def parse_wmake_log(log_file, args):
     """
     There may be multiple compilation targets; distinguish between compilation and linking.
     """
@@ -48,6 +53,7 @@ def parse_wmake_log(log_file):
 
     for line in lines:
         if 'g++' in line:
+            debugInfo(f'process line: {line}', args.debug)
             # Check for C++ standard settings
             cxx_match = re.search(r'-std=c\+\+(\d+)', line)
             if cxx_match:
@@ -60,29 +66,36 @@ def parse_wmake_log(log_file):
                 useld = re.search(r'(-fuse-ld=\S+)', line)
                 if useld:
                     link_options.append(f'{useld.group(1)}')
-                print(link_options)
                 # Handle output file
-                output_file = re.search(r'-o\s+(\S+)', line).group(1)
+                output_file = re.search(r' -o\s+(\S+)', line).group(1)
                 # Handle libraries
                 lib_matches = re.findall(r' -l(\S+)', line)
                 for lib in lib_matches:
                     if lib not in link_libraries:
                         link_libraries.append(lib)
-                link_directories.update(re.findall(r'-L(\S+)', line))
-
-                options = re.findall(r'( -\S+)', line)
+                link_directories.update(re.findall(r' -L(\S+)', line))
                 # Handle -Xlinker options
                 xlinker_options = re.findall(r'-Xlinker\s+(\S+)', line)
                 link_options.append(f'-Wl,{",".join(xlinker_options)}')
+                debugInfo(f'\tline for link', args.debug)
+                debugInfo(f'\t\ttarget: {output_file}', args.debug)
+                debugInfo(f'\t\tlink_libraries: {link_libraries}', args.debug)
+                debugInfo(f'\t\tlink_directories: {link_directories}', args.debug)
+                debugInfo(f'\t\tlink_options: {link_options}', args.debug)
             else:
                 # Compile statement
                 source_files.update(re.findall(r'-c\s+(\S+)\s+-o', line))
                 include_directories.update(re.findall(r'-I(\S+)', line))
                 compile_definitions.update(re.findall(r'-D(\S+)', line))
-                options = re.findall(r'(-\S+)', line)
-                exclude_prefixes = ('-I', '-D', '-o', '-c', '-std=c++')
-                compile_options.extend(opt for opt in options if not any(
-                    opt.startswith(prefix) for prefix in exclude_prefixes))
+                options = re.findall(r' -\S+', line)
+                exclude_prefixes = ['-I', '-D', '-std=c++', '-o', '-c']
+                compile_options.extend(opt for opt in options if not 
+                                       any(opt.startswith(' '+prefix) for prefix in exclude_prefixes) )
+                debugInfo(f'\tline for compile', args.debug)
+                debugInfo(f'\t\tsource_files: {source_files}', args.debug)
+                debugInfo(f'\t\tinclude_directories: {include_directories}', args.debug)
+                debugInfo(f'\t\tcompile_definitions: {compile_definitions}', args.debug)
+                debugInfo(f'\t\tcompile_options: {compile_options}', args.debug)
 
     # Handle specific include directories
     include_directories = {f"${{CMAKE_SOURCE_DIR}}/{dir}" if dir ==
@@ -126,7 +139,12 @@ def write_cmake_file(content, output_filename="CMakeLists.txt"):
         file.write(content)
 
 if __name__=="__main__":
+    parser = argparse.ArgumentParser(description='Generate CMakeLists.txt from wmake log')
+    parser.add_argument('logfile', type=str, help='wmake log file', default="log.wmake")
+    parser.add_argument('--debug', action='store_true', help='Enable debug mode', default=False)
+
+    args = parser.parse_args()
     # Use functions to parse the log and write CMakeLists.txt
-    cmake_content = parse_wmake_log("log.wmake")
+    cmake_content = parse_wmake_log(args.logfile, args)
     write_cmake_file(cmake_content)
     print("CMakeLists.txt has been generated successfully.")
