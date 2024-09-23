@@ -140,7 +140,7 @@ def write_cmake_file(content, output_filename="CMakeLists.txt"):
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Generate CMakeLists.txt from wmake log')
-    parser.add_argument('logfile', type=str, help='wmake log file', default="log.wmake")
+    parser.add_argument('logfile', type=str, help='wmake log file')
     parser.add_argument('--debug', action='store_true', help='Enable debug mode', default=False)
 
     args = parser.parse_args()

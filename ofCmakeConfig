@@ -25,7 +25,7 @@ IFS='.' read -r -a version_parts <<< "$PYTHON_VERSION"
 # Compare major and minor versions
 if [ "${version_parts[0]}" -gt 3 ] || { [ "${version_parts[0]}" -eq 3 ] && [ "${version_parts[1]}" -ge 6 ]; }; then
     script_dir=$(cd "$(dirname "$0")" && pwd)
-    $PYTHON_EXEC $script_dir/wmakelog2cmakelists.py
+    $PYTHON_EXEC $script_dir/wmakelog2cmakelists.py log.wmake
 else
     echo "Python version must be greater than 3.6, current version is: $PYTHON_VERSION"
     exit 1
